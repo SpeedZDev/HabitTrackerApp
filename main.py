@@ -30,36 +30,78 @@ class Goal():
     def MarkHabitToday(self):
         today = date.today()
         
-    
-       
-SideContainer = Frame(window)
-SideContainer.pack(side=RIGHT, fill=Y)
-CreationTaskBackground = Frame(SideContainer, width=200, bg="#2b2b2b")
+goalDisplayWindow = Frame(window, width=300, bg="#add8e6")
+goalDisplayWindow.pack_propagate(False)
+goalDisplayWindow.place(relx=0.5, rely=0.0, relheight=1.0, anchor="n")
+
+
+def RenderGoal(goalToDisplay):
+    GoalTypeText = Label(goalDisplayWindow, text="Task Type: " + goalToDisplay.GoalType)
+    GoalTypeText.place(relx=0.5, rely=0.45, anchor=CENTER)
+    DateCreatedText = Label(goalDisplayWindow, text="Goal Created: " + str(goalToDisplay.CreatedAt))
+    DateCreatedText.place(relx=0.5, rely=0.65, anchor=CENTER)
+    CompleteButton = Button(goalDisplayWindow)
+    if goalToDisplay.GoalType == "Task":
+        CompleteButton.config(text="Complete")
+        CompleteButton.place(relx=0.5, rely=0.85, anchor=CENTER)
+    if goalToDisplay.GoalType == "Habit":
+        CompleteButton.config(text="End Streak Counter")
+        CompleteButton.place(relx=0.5, rely=0.85, anchor=CENTER)
+
+
+SideContainer = Frame(window, width=250)
+SideContainer.place(relx=1.0, rely=0, anchor="ne", relheight=1.0)
+
+CreationTaskBackground = Frame(SideContainer, width=150, bg="#2b2b2b")
+
+CreationTaskBackground.pack_propagate(False)
 CreationTaskBackground.pack_forget()
 
+GoalTitleLable = Label(CreationTaskBackground, text="Enter Task Title Here")
 CreateGoalTitleField = Entry(CreationTaskBackground)
-CreateGoalTitleField.pack_forget()
 
 def ShowGoalCreationMenu():
-    AddNewGoalButton.pack_forget()
     CreationTaskBackground.pack(side=RIGHT, fill=Y)
-    CreationTaskBackground.pack_propagate(False)
+     
+    AddNewGoalButton.pack_forget()
+    GoalTitleLable.pack(pady=10)
     CreateGoalTitleField.pack(pady=50)
-    IsHabitCheckBox.pack(pady= 100)
-    IsTaskCheckBox.pack(pady=200)
+    IsHabitRadio.pack(pady=10)
+    IsTaskRadio.pack(pady=10)
+    SubmitNewGoalButton.pack(side=BOTTOM, anchor=CENTER)
 
-def SubmitNewGoal():
-    NewGoal = Goal(CreateGoalTitleField.get())
+def CreateNewGoal():
+    goaltype = ""
+    choice = GoalTypeDecider.get()
+    if choice == 1:
+        goaltype = "Habit"
+
+    if choice == 2:
+        goaltype = "Task"
+
+    NewGoal = Goal(CreateGoalTitleField.get(), goaltype)
     GoalList.append(NewGoal)
 
-    if len(GoalList) == 1:
-        GoalTitleDisplay.config(text=GoalList[0].Title) 
-        
+    
+    GoalTitleDisplay.config(text=GoalList[len(GoalList) - 1].Title) 
+    
+    RenderGoal(GoalList[len(GoalList) - 1])
+
+
+
+    GoalTitleLable.pack_forget()
+    IsHabitRadio.pack_forget()
+    IsTaskRadio.pack_forget()
+    SubmitNewGoalButton.pack_forget()
     CreateGoalTitleField.pack_forget()
+    CreateGoalTitleField.pack_forget()
+    CreationTaskBackground.pack_forget()
+    AddNewGoalButton.pack(side=TOP, anchor=NE)
+  
+    
 
-
-GoalTitleDisplay = Label(window, text="Goal Title",bg="white")
-GoalTitleDisplay.pack()
+GoalTitleDisplay = Label(window, text="Goal Title", bg="white")
+GoalTitleDisplay.place(relx=0.5, y=8, anchor="n")
 AddNewGoalButton = Button(window)
 
 AddtaskImage = PhotoImage(file="AddTaskButton.png")
@@ -67,18 +109,17 @@ AddNewGoalButton.config(image=AddtaskImage)
 AddNewGoalButton.config(command=ShowGoalCreationMenu)
 AddNewGoalButton.pack(side=TOP, anchor=NE)
 
+GoalTypeDecider = IntVar()
+IsHabitRadio = Radiobutton(CreationTaskBackground,text="Is This a Habit?",variable=GoalTypeDecider,value=1)
+IsTaskRadio = Radiobutton(CreationTaskBackground,text="Is This a Task?",variable=GoalTypeDecider,value=2)
 
-HabitDecider = IntVar()
-TaskDecider = IntVar()
-IsHabitCheckBox = Checkbutton(CreationTaskBackground, text="Is This a Habit?", variable=HabitDecider, onvalue=1, offvalue=0)
-IsTaskCheckBox = Checkbutton(CreationTaskBackground, text="Is This a Task?", variable=TaskDecider, onvalue=1, offvalue=0)
-
-SubmitNewGoalButton = Button(window)
+SubmitNewGoalButton = Button(CreationTaskBackground)
 SubmitNewGoalButton.config(text="Submit")
 SubmitNewGoalButton.config(background="#00bd32")
 SubmitNewGoalButton.pack(side=BOTTOM, anchor=CENTER)
-SubmitNewGoalButton.config(command=SubmitNewGoal)
-SubmitNewGoalButton.pack()
+SubmitNewGoalButton.config(command=CreateNewGoal)
+
+
 
 
 window.mainloop()
