@@ -7,6 +7,7 @@ window = Tk()
 window.geometry("420x420")
 window.title("Tracker App")
 
+#Goal Class
 class Goal():
     def __init__(self, Title, GoalType):
         self.Title = Title
@@ -34,7 +35,7 @@ goalDisplayWindow = Frame(window, width=300, bg="#add8e6")
 goalDisplayWindow.pack_propagate(False)
 goalDisplayWindow.place(relx=0.5, rely=0.0, relheight=1.0, anchor="n")
 
-
+#Renders My Goals
 def RenderGoal(goalToDisplay):
     GoalTypeText = Label(goalDisplayWindow, text="Task Type: " + goalToDisplay.GoalType)
     GoalTypeText.place(relx=0.5, rely=0.45, anchor=CENTER)
@@ -49,6 +50,7 @@ def RenderGoal(goalToDisplay):
         CompleteButton.place(relx=0.5, rely=0.85, anchor=CENTER)
 
 
+#Cointianer For Task Creation Menu
 SideContainer = Frame(window, width=250)
 SideContainer.place(relx=1.0, rely=0, anchor="ne", relheight=1.0)
 
@@ -60,6 +62,7 @@ CreationTaskBackground.pack_forget()
 GoalTitleLable = Label(CreationTaskBackground, text="Enter Task Title Here")
 CreateGoalTitleField = Entry(CreationTaskBackground)
 
+#Opens Goal Creation Menu
 def ShowGoalCreationMenu():
     CreationTaskBackground.pack(side=RIGHT, fill=Y)
      
@@ -88,7 +91,7 @@ def CreateNewGoal():
     RenderGoal(GoalList[len(GoalList) - 1])
 
 
-
+    #Hides ALL UI In MENU
     GoalTitleLable.pack_forget()
     IsHabitRadio.pack_forget()
     IsTaskRadio.pack_forget()
@@ -99,16 +102,18 @@ def CreateNewGoal():
     AddNewGoalButton.pack(side=TOP, anchor=NE)
   
     
-
+#Displays Goal Ttitle
 GoalTitleDisplay = Label(window, text="Goal Title", bg="white")
 GoalTitleDisplay.place(relx=0.5, y=8, anchor="n")
 AddNewGoalButton = Button(window)
 
+#SHows Image For adding a task to open the menu
 AddtaskImage = PhotoImage(file="AddTaskButton.png")
 AddNewGoalButton.config(image=AddtaskImage)
 AddNewGoalButton.config(command=ShowGoalCreationMenu)
 AddNewGoalButton.pack(side=TOP, anchor=NE)
 
+#Radio Buttons For Tasks
 GoalTypeDecider = IntVar()
 IsHabitRadio = Radiobutton(CreationTaskBackground,text="Is This a Habit?",variable=GoalTypeDecider,value=1)
 IsTaskRadio = Radiobutton(CreationTaskBackground,text="Is This a Task?",variable=GoalTypeDecider,value=2)
