@@ -1,7 +1,8 @@
 from tkinter import *
 from datetime import date
-GoalList = []
 
+GoalList = []
+DisplayIndex = 0
 
 window = Tk()
 window.geometry("420x420")
@@ -37,6 +38,10 @@ goalDisplayWindow.place(relx=0.5, rely=0.0, relheight=1.0, anchor="n")
 
 #Renders My Goals
 def RenderGoal(goalToDisplay):
+
+    for w in goalDisplayWindow.winfo_children():
+        w.destroy()
+
     GoalTypeText = Label(goalDisplayWindow, text="Task Type: " + goalToDisplay.GoalType)
     GoalTypeText.place(relx=0.5, rely=0.45, anchor=CENTER)
     DateCreatedText = Label(goalDisplayWindow, text="Goal Created: " + str(goalToDisplay.CreatedAt))
@@ -74,6 +79,8 @@ def ShowGoalCreationMenu():
     SubmitNewGoalButton.pack(side=BOTTOM, anchor=CENTER)
 
 def CreateNewGoal():
+    global DisplayIndex
+
     goaltype = ""
     choice = GoalTypeDecider.get()
     if choice == 1:
@@ -86,10 +93,10 @@ def CreateNewGoal():
     GoalList.append(NewGoal)
 
     
-    GoalTitleDisplay.config(text=GoalList[len(GoalList) - 1].Title) 
+    DisplayIndex = len(GoalList) - 1
+    GoalTitleDisplay.config(text=GoalList[DisplayIndex].Title) 
     
-    RenderGoal(GoalList[len(GoalList) - 1])
-
+    RenderGoal(GoalList[DisplayIndex])
 
     #Hides ALL UI In MENU
     GoalTitleLable.pack_forget()
@@ -101,7 +108,34 @@ def CreateNewGoal():
     CreationTaskBackground.pack_forget()
     AddNewGoalButton.pack(side=TOP, anchor=NE)
   
+#Checks when up arrow key is pressed on my keyboard
+def OnArrowUp(event):
+    global DisplayIndex 
+    if not GoalList:
+        return
+
+    DisplayIndex = max(0, DisplayIndex-1)
+    print("UpArrow Pressed")
+    GoalTitleDisplay.config(text=GoalList[DisplayIndex].Title)
     
+    RenderGoal(GoalList[DisplayIndex])
+
+#Checks when Down arrow key is pressed on my keyboard
+def OnArrowDown(event):
+    global DisplayIndex
+    if not GoalList:
+        return
+
+    DisplayIndex = min(len(GoalList) - 1, DisplayIndex + 1)
+    print("DownArrow Pressed")
+    GoalTitleDisplay.config(text=GoalList[DisplayIndex].Title)
+
+    RenderGoal(GoalList[DisplayIndex])
+
+window.bind_all("<Up>", OnArrowUp)
+window.bind_all("<Down>", OnArrowDown)
+
+
 #Displays Goal Ttitle
 GoalTitleDisplay = Label(window, text="Goal Title", bg="white")
 GoalTitleDisplay.place(relx=0.5, y=8, anchor="n")
