@@ -1,5 +1,7 @@
 from tkinter import *
 from datetime import date, datetime
+import json
+import os
 
 GoalList = []
 CardWidgets = []
@@ -10,6 +12,59 @@ RenderToken = 0
 window = Tk()
 window.geometry("420x420")
 window.title("Tracker App")
+
+
+
+def SaveGoals():
+    data = []
+
+    for goal in GoalList:
+        goal_data = {"Title": goal.Title,"GoalType": goal.GoalType,"CreatedAt": goal.CreatedAt.isoformat()}
+
+        if goal.GoalType == "Task":
+            goal_data["completed"] = goal.completed
+            goal_data["CompletedAt"] = (goal.CompletedAt.isoformat() if goal.CompletedAt else None)
+
+        if goal.GoalType == "Habit":
+            goal_data["last_done"] = (goal.LastDone.isoformat() if goal.LastDone else None)
+            goal_data["cooldown_seconds"] = goal.CooldownSeconds
+
+        data.append(goal_data)
+
+    with open("goals.json", "w") as f:
+        json.dump(data, f, indent=4)
+
+
+def LoadGoals():
+    if not os.path.exists("goals.json"):
+        return
+
+    with open("goals.json", "r") as f:
+        data = json.load(f)
+
+    for item in data:
+        goal = Goal(item["Title"], item["GoalType"])
+
+        goal.CreatedAt = date.fromisoformat(item["CreatedAt"])
+
+        if goal.GoalType == "Task":
+            goal.completed = item.get("completed", False)
+          
+            completed_at = item.get("CompletedAt")
+
+            if completed_at:
+                goal.CompletedAt = date.fromisoformat(completed_at)
+
+        if goal.GoalType == "Habit":
+            last_done = item.get("last_done")
+         
+            if last_done:
+                goal.last_done = datetime.fromisoformat(last_done)
+            goal.cooldown_seconds = item.get("cooldown_seconds", 86400)
+
+        GoalList.append(goal)
+
+    RepositionCards()
 
 #Goal Class
 class Goal():
@@ -125,6 +180,7 @@ def DeleteGoal(goal):
     index = GoalList.index(goal)
     GoalList.pop(index)
 
+    SaveGoals()
     RepositionCards()
 
     if GoalList:
@@ -136,6 +192,9 @@ def DeleteGoal(goal):
         for w in goalDisplayWindow.winfo_children():
             w.destroy()
 
+
+def OnComplete():
+    print("Take Complete")
 #Renders My Goals
 def RenderGoal(goalToDisplay):
     global RenderToken
@@ -152,13 +211,13 @@ def RenderGoal(goalToDisplay):
     DateCreatedText = Label(goalDisplayWindow, text="Goal Created: " + str(goalToDisplay.CreatedAt))
     DateCreatedText.place(relx=0.5, rely=0.65, anchor=CENTER)
 
-    # -------- TASK --------
+    
     if goalToDisplay.GoalType == "Task":
         CompleteButton = Button(goalDisplayWindow, text="Complete", command=OnComplete)
         CompleteButton.place(relx=0.5, rely=0.85, anchor=CENTER)
         return
 
-    # -------- HABIT (cooldown) --------
+    
     if goalToDisplay.GoalType == "Habit":
         now = datetime.now()
         last = getattr(goalToDisplay, "LastDone", None)
@@ -170,11 +229,12 @@ def RenderGoal(goalToDisplay):
             elapsed = (now - last).total_seconds()
 
         if elapsed >= cooldown:
-            def complete_habit():
+            def CompleteHabit():
                 goalToDisplay.LastDone = datetime.now()
+                SaveGoals()
                 RenderGoal(goalToDisplay)
 
-            CompleteButton = Button(goalDisplayWindow, text="Complete Habit", command=complete_habit)
+            CompleteButton = Button(goalDisplayWindow, text="Complete Habit", command=CompleteHabit)
             CompleteButton.place(relx=0.5, rely=0.85, anchor=CENTER)
 
         else:
@@ -196,9 +256,6 @@ def RenderGoal(goalToDisplay):
 
             goalDisplayWindow.after(1000, tick)
 
-
-def OnComplete():
-    print("Task Finished")
 
 
 #cointianer For Task Creation Menu
@@ -245,11 +302,12 @@ def CreateNewGoal():
     elif choice == 2:
         goaltype = "Task"
     else:
-        return  # nothing selected
+        return  
 
     NewGoal = Goal(CreateGoalTitleField.get(), goaltype)
 
-    GoalList.append(NewGoal)     
+    GoalList.append(NewGoal)   
+    SaveGoals()  
     RepositionCards()             
 
     DisplayIndex = len(GoalList) - 1
@@ -317,5 +375,5 @@ SubmitNewGoalButton.config(command=CreateNewGoal)
 
 
 
-
+LoadGoals()
 window.mainloop()
