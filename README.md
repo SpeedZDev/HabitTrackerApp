@@ -38,7 +38,7 @@ It’s lightweight, fast, and designed to be easy to extend.
 Add screenshots here if you want:
 ![image alt](https://github.com/SpeedZDev/HabitTrackerApp/blob/main/Screenshot%202026-02-22%20161623.png?raw=true)
 ![image alt](https://github.com/SpeedZDev/HabitTrackerApp/blob/main/Screenshot%202026-02-22%20161735.png?raw=true)
-![image alt](https://github.com/SpeedZDev/HabitTrackerApp/blob/main/Screenshot%202026-02-22%20161623.png?raw=true)
+![image alt](https://github.com/SpeedZDev/HabitTrackerApp/blob/main/Screenshot%202026-02-22%20161835.png?raw=true)
 ---
 
 ## Requirements
